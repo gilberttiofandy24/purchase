@@ -35,12 +35,12 @@ export const upsertGrossSalesEntry = async (data: {
   await api.put('/purchase/gross-sales', data);
 };
 
-export const upsertNetSales = async (data: {
+export const upsertNetSalesRate = async (data: {
   store_id: string;
   week_start_date: string;
-  amount: number;
+  rate: number;
 }): Promise<void> => {
-  await api.put('/purchase/net-sales', data);
+  await api.put('/net-sales/rate', data);
 };
 
 export const upsertLabourHourEntry = async (data: {

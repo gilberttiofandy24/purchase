@@ -99,8 +99,8 @@ const LabourGrid = ({ storeId, weekStartDate, report }: LabourGridProps) => {
           };
           const labourTotal = Object.values(labourDaily).reduce((a, d) => a + d.labour_cost, 0);
           const labourCostPct =
-            old.data.net_sales_from_gross > 0
-              ? (labourTotal / old.data.net_sales_from_gross) * 100
+            old.data.net_sales > 0
+              ? (labourTotal / old.data.net_sales) * 100
               : 0;
 
           return {
@@ -230,8 +230,8 @@ const LabourGrid = ({ storeId, weekStartDate, report }: LabourGridProps) => {
 
         <div className="mt-4 flex flex-col gap-1 text-sm">
           <div>
-            Net Sales (Gross Sales ÷ 1.10):{' '}
-            <span className="font-medium">{formatCurrency(report.net_sales_from_gross)}</span>
+            Net Sales:{' '}
+            <span className="font-medium">{formatCurrency(report.net_sales)}</span>
           </div>
           <div>
             Labour Cost %:{' '}

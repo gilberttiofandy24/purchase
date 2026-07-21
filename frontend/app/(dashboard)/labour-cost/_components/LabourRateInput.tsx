@@ -42,8 +42,8 @@ const LabourRateInput = ({
           );
           const labourTotal = Object.values(labourDaily).reduce((a, d) => a + d.labour_cost, 0);
           const labourCostPct =
-            old.data.net_sales_from_gross > 0
-              ? (labourTotal / old.data.net_sales_from_gross) * 100
+            old.data.net_sales > 0
+              ? (labourTotal / old.data.net_sales) * 100
               : 0;
           return {
             ...old,

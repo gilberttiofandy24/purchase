@@ -28,7 +28,7 @@ func Connect() *gorm.DB {
 		&models.Supplier{},
 		&models.PurchaseEntry{},
 		&models.GrossSalesEntry{},
-		&models.WeeklyNetSales{},
+		&models.WeeklyNetSalesRate{},
 		&models.WeeklyLabourRate{},
 		&models.Employee{},
 		&models.LabourHourEntry{},

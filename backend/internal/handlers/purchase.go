@@ -17,9 +17,9 @@ import (
 const dateLayout = "2006-01-02"
 
 const (
-	fallbackWeekdayRate = 37.02 // 33.05 base wage x 1.12 super, used until a store sets its own gross rate
-	fallbackWeekendRate = 44.42 // 39.66 base wage x 1.12 super
-	gstDivisor          = 1.10
+	fallbackWeekdayRate  = 37.02 // 33.05 base wage x 1.12 super, used until a store sets its own gross rate
+	fallbackWeekendRate  = 44.42 // 39.66 base wage x 1.12 super
+	fallbackNetSalesRate = 0.9   // Net Sales = Gross Sales x rate, used until a store sets its own rate
 )
 
 func labourCostForDay(date time.Time, totalHours, weekdayRate, weekendRate float64) float64 {
@@ -70,13 +70,13 @@ type weeklyReportData struct {
 	GrossSalesDaily    map[string]float64       `json:"gross_sales_daily"`
 	GrossSalesTotal    float64                  `json:"gross_sales_total"`
 	NetSales           float64                  `json:"net_sales"`
+	NetSalesRate       float64                  `json:"net_sales_rate"`
 	PurchaseRatioPct   float64                  `json:"purchase_ratio_pct"`
 	Employees          []employeeWeekRow        `json:"employees"`
 	WeekdayRate        float64                  `json:"weekday_rate"`
 	WeekendRate        float64                  `json:"weekend_rate"`
 	LabourDaily        map[string]labourDayInfo `json:"labour_daily"`
 	LabourTotal        float64                  `json:"labour_total"`
-	NetSalesFromGross  float64                  `json:"net_sales_from_gross"`
 	LabourCostPct      float64                  `json:"labour_cost_pct"`
 }
 
@@ -167,11 +167,12 @@ func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 		return
 	}
 
-	var netSalesEntry models.WeeklyNetSales
-	var netSales float64
-	err = h.db.Where("store_id = ? AND week_start_date = ?", storeID, weekStart).First(&netSalesEntry).Error
+	netSalesRate := fallbackNetSalesRate
+	var netSalesRateEntry models.WeeklyNetSalesRate
+	err = h.db.Where("store_id = ? AND week_start_date <= ?", storeID, weekStart).
+		Order("week_start_date DESC").First(&netSalesRateEntry).Error
 	if err == nil {
-		netSales = netSalesEntry.Amount
+		netSalesRate = netSalesRateEntry.Rate
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
 		return
@@ -208,6 +209,7 @@ func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 		grossTotal += grossByDate[d]
 	}
 
+	netSales := grossTotal * netSalesRate
 	var purchaseRatioPct float64
 	if netSales > 0 {
 		purchaseRatioPct = grandTotal / netSales * 100
@@ -260,10 +262,9 @@ func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 		labourTotal += cost
 	}
 
-	netSalesFromGross := grossTotal / gstDivisor
 	var labourCostPct float64
-	if netSalesFromGross > 0 {
-		labourCostPct = labourTotal / netSalesFromGross * 100
+	if netSales > 0 {
+		labourCostPct = labourTotal / netSales * 100
 	}
 
 	data := weeklyReportData{
@@ -275,13 +276,13 @@ func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 		GrossSalesDaily:    grossFilled,
 		GrossSalesTotal:    grossTotal,
 		NetSales:           netSales,
+		NetSalesRate:       netSalesRate,
 		PurchaseRatioPct:   purchaseRatioPct,
 		Employees:          employeeRows,
 		WeekdayRate:        weekdayRate,
 		WeekendRate:        weekendRate,
 		LabourDaily:        labourFilled,
 		LabourTotal:        labourTotal,
-		NetSalesFromGross:  netSalesFromGross,
 		LabourCostPct:      labourCostPct,
 	}
 
@@ -354,14 +355,14 @@ func (h *PurchaseHandler) UpsertGrossSales(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Gross sales entry saved successfully"})
 }
 
-type upsertNetSalesRequest struct {
+type upsertNetSalesRateRequest struct {
 	StoreID       uuid.UUID `json:"store_id" binding:"required"`
 	WeekStartDate string    `json:"week_start_date" binding:"required"`
-	Amount        float64   `json:"amount" binding:"min=0"`
+	Rate          float64   `json:"rate" binding:"min=0"`
 }
 
-func (h *PurchaseHandler) UpsertNetSales(c *gin.Context) {
-	var req upsertNetSalesRequest
+func (h *PurchaseHandler) UpsertNetSalesRate(c *gin.Context) {
+	var req upsertNetSalesRateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid payload"})
 		return
@@ -372,16 +373,16 @@ func (h *PurchaseHandler) UpsertNetSales(c *gin.Context) {
 		return
 	}
 
-	entry := models.WeeklyNetSales{StoreID: req.StoreID, WeekStartDate: weekStart, Amount: req.Amount}
+	entry := models.WeeklyNetSalesRate{StoreID: req.StoreID, WeekStartDate: weekStart, Rate: req.Rate}
 	err = h.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "store_id"}, {Name: "week_start_date"}},
-		DoUpdates: clause.AssignmentColumns([]string{"amount", "updated_at"}),
+		DoUpdates: clause.AssignmentColumns([]string{"rate", "updated_at"}),
 	}).Create(&entry).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Net sales saved successfully"})
+	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Net sales rate saved successfully"})
 }
 
 type upsertLabourRateRequest struct {
@@ -478,7 +479,7 @@ func RegisterPurchaseRoutes(rg *gin.RouterGroup, h *PurchaseHandler) {
 	rg.GET("/purchase/weekly-report", h.GetWeeklyReport)
 	rg.PUT("/purchase/entry", h.UpsertPurchaseEntry)
 	rg.PUT("/purchase/gross-sales", h.UpsertGrossSales)
-	rg.PUT("/purchase/net-sales", h.UpsertNetSales)
+	rg.PUT("/net-sales/rate", h.UpsertNetSalesRate)
 	rg.PUT("/labour/rate", h.UpsertLabourRate)
 	rg.PUT("/labour/hour-entry", h.UpsertLabourHourEntry)
 	rg.POST("/labour/verify-otp", h.VerifyLabourOtp)

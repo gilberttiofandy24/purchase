@@ -1,7 +1,6 @@
 'use client';
 
 import GrossSalesRow from '@/app/(dashboard)/purchase-report/_components/GrossSalesRow';
-import NetSalesInput from '@/app/(dashboard)/purchase-report/_components/NetSalesInput';
 import PurchaseGrid from '@/app/(dashboard)/purchase-report/_components/PurchaseGrid';
 import PurchaseRatioPieChart from '@/app/(dashboard)/purchase-report/_components/PurchaseRatioPieChart';
 import StoreSelector from '@/app/(dashboard)/purchase-report/_components/StoreSelector';
@@ -78,15 +77,7 @@ const PurchaseReportPage = () => {
           <PurchaseGrid storeId={storeId} weekStartDate={weekStartDate} report={report} />
 
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="flex flex-col gap-4">
-              <GrossSalesRow storeId={storeId} weekStartDate={weekStartDate} report={report} />
-              <NetSalesInput
-                storeId={storeId}
-                weekStartDate={weekStartDate}
-                netSales={report.net_sales}
-                purchaseRatioPct={report.purchase_ratio_pct}
-              />
-            </div>
+            <GrossSalesRow storeId={storeId} weekStartDate={weekStartDate} report={report} />
             <PurchaseRatioPieChart suppliers={report.suppliers} />
           </div>
         </>

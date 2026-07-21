@@ -70,11 +70,11 @@ type LabourHourEntry struct {
 	UpdatedAt  time.Time `json:"updated_at"`
 }
 
-type WeeklyNetSales struct {
+type WeeklyNetSalesRate struct {
 	ID            uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
-	StoreID       uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_net_sales_store_week" json:"store_id"`
-	WeekStartDate time.Time `gorm:"type:date;not null;uniqueIndex:idx_net_sales_store_week" json:"week_start_date"`
-	Amount        float64   `gorm:"type:numeric(15,2);not null;default:0" json:"amount"`
+	StoreID       uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_net_sales_rate_store_week" json:"store_id"`
+	WeekStartDate time.Time `gorm:"type:date;not null;uniqueIndex:idx_net_sales_rate_store_week" json:"week_start_date"`
+	Rate          float64   `gorm:"type:numeric(6,4);not null;default:0" json:"rate"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }

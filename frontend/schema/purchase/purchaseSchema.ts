@@ -30,12 +30,12 @@ export type WeeklyReportData = {
   gross_sales_daily: Record<string, number>;
   gross_sales_total: number;
   net_sales: number;
+  net_sales_rate: number;
   purchase_ratio_pct: number;
   employees: EmployeeWeekRow[];
   weekday_rate: number;
   weekend_rate: number;
   labour_daily: Record<string, LabourDayInfo>;
   labour_total: number;
-  net_sales_from_gross: number;
   labour_cost_pct: number;
 };
