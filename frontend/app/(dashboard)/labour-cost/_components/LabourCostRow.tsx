@@ -1,6 +1,6 @@
 'use client';
 
-import LabourDayCell from '@/app/(dashboard)/purchase-report/_components/LabourDayCell';
+import LabourDayCell from '@/app/(dashboard)/labour-cost/_components/LabourDayCell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,

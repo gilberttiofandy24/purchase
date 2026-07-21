@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"net/http"
+	"os"
 	"time"
 
 	"purchase-tracker/internal/models"
@@ -353,10 +354,29 @@ func (h *PurchaseHandler) UpsertLabourEntry(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Labour entry saved successfully"})
 }
 
+type verifyLabourOtpRequest struct {
+	Code string `json:"code" binding:"required"`
+}
+
+func (h *PurchaseHandler) VerifyLabourOtp(c *gin.Context) {
+	var req verifyLabourOtpRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
+		return
+	}
+	expected := os.Getenv("LABOUR_OTP_CODE")
+	if expected == "" || req.Code != expected {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Kode OTP salah"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "OTP valid"})
+}
+
 func RegisterPurchaseRoutes(rg *gin.RouterGroup, h *PurchaseHandler) {
 	rg.GET("/purchase/weekly-report", h.GetWeeklyReport)
 	rg.PUT("/purchase/entry", h.UpsertPurchaseEntry)
 	rg.PUT("/purchase/gross-sales", h.UpsertGrossSales)
 	rg.PUT("/purchase/net-sales", h.UpsertNetSales)
 	rg.PUT("/purchase/labour-entry", h.UpsertLabourEntry)
+	rg.POST("/labour/verify-otp", h.VerifyLabourOtp)
 }

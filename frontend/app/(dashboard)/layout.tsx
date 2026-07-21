@@ -3,12 +3,13 @@
 import { Button } from '@/components/ui/button';
 import { getMe, getMeQueryKey, logout } from '@/lib/api/auth';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { LogOut, Store as StoreIcon, ClipboardList } from 'lucide-react';
+import { LogOut, Store as StoreIcon, ClipboardList, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 const navItems = [
   { title: 'Purchase Report', url: '/purchase-report', icon: ClipboardList },
+  { title: 'Labour Cost', url: '/labour-cost', icon: Users },
   { title: 'Toko', url: '/store', icon: StoreIcon },
 ];
 

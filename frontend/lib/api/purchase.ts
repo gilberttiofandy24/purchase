@@ -51,3 +51,7 @@ export const upsertLabourEntry = async (data: {
 }): Promise<void> => {
   await api.put('/purchase/labour-entry', data);
 };
+
+export const verifyLabourOtp = async (code: string): Promise<void> => {
+  await api.post('/labour/verify-otp', { code });
+};
