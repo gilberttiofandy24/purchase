@@ -1,5 +1,6 @@
 'use client';
 
+import GrossSalesRow from '@/app/(dashboard)/summary/_components/GrossSalesRow';
 import NetSalesRateInput from '@/app/(dashboard)/summary/_components/NetSalesRateInput';
 import StoreSelector from '@/app/(dashboard)/purchase-report/_components/StoreSelector';
 import WeekNavigator from '@/app/(dashboard)/purchase-report/_components/WeekNavigator';
@@ -157,6 +158,8 @@ const SummaryPage = () => {
               </TableBody>
             </Table>
           </div>
+
+          <GrossSalesRow storeId={storeId} weekStartDate={weekStartDate} report={report} />
 
           <div className="grid gap-4 md:grid-cols-2">
             <Card>

@@ -48,9 +48,20 @@ const GrossSalesRow = ({ storeId, weekStartDate, report }: GrossSalesRowProps) =
             [variables.sales_date]: variables.amount,
           };
           const grossSalesTotal = Object.values(grossSalesDaily).reduce((a, b) => a + b, 0);
+          const netSales = grossSalesTotal * old.data.net_sales_rate;
+          const purchaseRatioPct =
+            netSales > 0 ? (old.data.grand_total_purchase / netSales) * 100 : 0;
+          const labourCostPct = netSales > 0 ? (old.data.labour_total / netSales) * 100 : 0;
           return {
             ...old,
-            data: { ...old.data, gross_sales_daily: grossSalesDaily, gross_sales_total: grossSalesTotal },
+            data: {
+              ...old.data,
+              gross_sales_daily: grossSalesDaily,
+              gross_sales_total: grossSalesTotal,
+              net_sales: netSales,
+              purchase_ratio_pct: purchaseRatioPct,
+              labour_cost_pct: labourCostPct,
+            },
           };
         }
       );

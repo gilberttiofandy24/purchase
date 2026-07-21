@@ -1,6 +1,5 @@
 'use client';
 
-import GrossSalesRow from '@/app/(dashboard)/purchase-report/_components/GrossSalesRow';
 import PurchaseGrid from '@/app/(dashboard)/purchase-report/_components/PurchaseGrid';
 import PurchaseRatioPieChart from '@/app/(dashboard)/purchase-report/_components/PurchaseRatioPieChart';
 import StoreSelector from '@/app/(dashboard)/purchase-report/_components/StoreSelector';
@@ -76,10 +75,7 @@ const PurchaseReportPage = () => {
         <>
           <PurchaseGrid storeId={storeId} weekStartDate={weekStartDate} report={report} />
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <GrossSalesRow storeId={storeId} weekStartDate={weekStartDate} report={report} />
-            <PurchaseRatioPieChart suppliers={report.suppliers} />
-          </div>
+          <PurchaseRatioPieChart suppliers={report.suppliers} />
         </>
       )}
     </div>
