@@ -55,3 +55,12 @@ export const upsertLabourHourEntry = async (data: {
 export const verifyLabourOtp = async (code: string): Promise<void> => {
   await api.post('/labour/verify-otp', { code });
 };
+
+export const upsertLabourRate = async (data: {
+  store_id: string;
+  week_start_date: string;
+  weekday_rate: number;
+  weekend_rate: number;
+}): Promise<void> => {
+  await api.put('/labour/rate', data);
+};

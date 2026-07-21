@@ -17,18 +17,17 @@ import (
 const dateLayout = "2006-01-02"
 
 const (
-	weekdayWageRate = 33.05
-	weekendWageRate = 39.66
-	superMultiplier = 1.12
-	gstDivisor      = 1.10
+	fallbackWeekdayRate = 37.02 // 33.05 base wage x 1.12 super, used until a store sets its own gross rate
+	fallbackWeekendRate = 44.42 // 39.66 base wage x 1.12 super
+	gstDivisor          = 1.10
 )
 
-func labourCostForDay(date time.Time, totalHours float64) float64 {
-	rate := weekdayWageRate
+func labourCostForDay(date time.Time, totalHours, weekdayRate, weekendRate float64) float64 {
+	rate := weekdayRate
 	if date.Weekday() == time.Saturday || date.Weekday() == time.Sunday {
-		rate = weekendWageRate
+		rate = weekendRate
 	}
-	return totalHours * rate * superMultiplier
+	return totalHours * rate
 }
 
 type PurchaseHandler struct {
@@ -73,6 +72,8 @@ type weeklyReportData struct {
 	NetSales           float64                  `json:"net_sales"`
 	PurchaseRatioPct   float64                  `json:"purchase_ratio_pct"`
 	Employees          []employeeWeekRow        `json:"employees"`
+	WeekdayRate        float64                  `json:"weekday_rate"`
+	WeekendRate        float64                  `json:"weekend_rate"`
 	LabourDaily        map[string]labourDayInfo `json:"labour_daily"`
 	LabourTotal        float64                  `json:"labour_total"`
 	NetSalesFromGross  float64                  `json:"net_sales_from_gross"`
@@ -153,6 +154,17 @@ func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 			hoursByEmployee[l.EmployeeID] = make(map[string]float64)
 		}
 		hoursByEmployee[l.EmployeeID][l.EntryDate.Format(dateLayout)] = l.TotalHours
+	}
+
+	weekdayRate, weekendRate := fallbackWeekdayRate, fallbackWeekendRate
+	var labourRate models.WeeklyLabourRate
+	err = h.db.Where("store_id = ? AND week_start_date <= ?", storeID, weekStart).
+		Order("week_start_date DESC").First(&labourRate).Error
+	if err == nil {
+		weekdayRate, weekendRate = labourRate.WeekdayRate, labourRate.WeekendRate
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+		return
 	}
 
 	var netSalesEntry models.WeeklyNetSales
@@ -238,7 +250,7 @@ func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 				staffCount++
 			}
 		}
-		cost := labourCostForDay(date, dayHours)
+		cost := labourCostForDay(date, dayHours, weekdayRate, weekendRate)
 		labourFilled[d] = labourDayInfo{
 			StaffCount: staffCount,
 			TotalHours: dayHours,
@@ -265,6 +277,8 @@ func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 		NetSales:           netSales,
 		PurchaseRatioPct:   purchaseRatioPct,
 		Employees:          employeeRows,
+		WeekdayRate:        weekdayRate,
+		WeekendRate:        weekendRate,
 		LabourDaily:        labourFilled,
 		LabourTotal:        labourTotal,
 		NetSalesFromGross:  netSalesFromGross,
@@ -370,6 +384,42 @@ func (h *PurchaseHandler) UpsertNetSales(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Net sales saved successfully"})
 }
 
+type upsertLabourRateRequest struct {
+	StoreID       uuid.UUID `json:"store_id" binding:"required"`
+	WeekStartDate string    `json:"week_start_date" binding:"required"`
+	WeekdayRate   float64   `json:"weekday_rate" binding:"min=0"`
+	WeekendRate   float64   `json:"weekend_rate" binding:"min=0"`
+}
+
+func (h *PurchaseHandler) UpsertLabourRate(c *gin.Context) {
+	var req upsertLabourRateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
+		return
+	}
+	weekStart, err := time.Parse(dateLayout, req.WeekStartDate)
+	if err != nil || weekStart.Weekday() != time.Monday {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "week_start_date harus format YYYY-MM-DD dan hari Senin"})
+		return
+	}
+
+	entry := models.WeeklyLabourRate{
+		StoreID:       req.StoreID,
+		WeekStartDate: weekStart,
+		WeekdayRate:   req.WeekdayRate,
+		WeekendRate:   req.WeekendRate,
+	}
+	err = h.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "store_id"}, {Name: "week_start_date"}},
+		DoUpdates: clause.AssignmentColumns([]string{"weekday_rate", "weekend_rate", "updated_at"}),
+	}).Create(&entry).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Labour rate saved successfully"})
+}
+
 type upsertLabourHourEntryRequest struct {
 	StoreID    uuid.UUID `json:"store_id" binding:"required"`
 	EmployeeID uuid.UUID `json:"employee_id" binding:"required"`
@@ -429,6 +479,7 @@ func RegisterPurchaseRoutes(rg *gin.RouterGroup, h *PurchaseHandler) {
 	rg.PUT("/purchase/entry", h.UpsertPurchaseEntry)
 	rg.PUT("/purchase/gross-sales", h.UpsertGrossSales)
 	rg.PUT("/purchase/net-sales", h.UpsertNetSales)
+	rg.PUT("/labour/rate", h.UpsertLabourRate)
 	rg.PUT("/labour/hour-entry", h.UpsertLabourHourEntry)
 	rg.POST("/labour/verify-otp", h.VerifyLabourOtp)
 }

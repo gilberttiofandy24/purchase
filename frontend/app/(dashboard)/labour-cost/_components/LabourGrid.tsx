@@ -30,14 +30,15 @@ interface LabourGridProps {
 
 const dayLabels = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 
-const weekdayRate = 33.05;
-const weekendRate = 39.66;
-const superMultiplier = 1.12;
-
-function labourCostFor(date: string, totalHours: number): number {
+function labourCostFor(
+  date: string,
+  totalHours: number,
+  weekdayRate: number,
+  weekendRate: number
+): number {
   const isWeekend = DateTime.fromISO(date).weekday >= 6;
   const rate = isWeekend ? weekendRate : weekdayRate;
-  return totalHours * rate * superMultiplier;
+  return totalHours * rate;
 }
 
 const LabourGrid = ({ storeId, weekStartDate, report }: LabourGridProps) => {
@@ -80,7 +81,12 @@ const LabourGrid = ({ storeId, weekStartDate, report }: LabourGridProps) => {
           const staffCount = withPct.filter(
             (e) => (e.daily_hours[variables.entry_date] || 0) > 0
           ).length;
-          const cost = labourCostFor(variables.entry_date, dayTotalHours);
+          const cost = labourCostFor(
+            variables.entry_date,
+            dayTotalHours,
+            old.data.weekday_rate,
+            old.data.weekend_rate
+          );
           const existing: LabourDayInfo | undefined = old.data.labour_daily[variables.entry_date];
           const labourDaily = {
             ...old.data.labour_daily,

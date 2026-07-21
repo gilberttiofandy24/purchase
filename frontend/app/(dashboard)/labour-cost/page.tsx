@@ -2,6 +2,7 @@
 
 import LabourGrid from '@/app/(dashboard)/labour-cost/_components/LabourGrid';
 import LabourOtpGate from '@/app/(dashboard)/labour-cost/_components/LabourOtpGate';
+import LabourRateInput from '@/app/(dashboard)/labour-cost/_components/LabourRateInput';
 import StoreSelector from '@/app/(dashboard)/purchase-report/_components/StoreSelector';
 import WeekNavigator from '@/app/(dashboard)/purchase-report/_components/WeekNavigator';
 import { getStores, getStoresQueryKey } from '@/lib/api/store';
@@ -73,7 +74,15 @@ const LabourCostPage = () => {
         )}
 
         {report && storeId && (
-          <LabourGrid storeId={storeId} weekStartDate={weekStartDate} report={report} />
+          <>
+            <LabourRateInput
+              storeId={storeId}
+              weekStartDate={weekStartDate}
+              weekdayRate={report.weekday_rate}
+              weekendRate={report.weekend_rate}
+            />
+            <LabourGrid storeId={storeId} weekStartDate={weekStartDate} report={report} />
+          </>
         )}
       </div>
     </LabourOtpGate>

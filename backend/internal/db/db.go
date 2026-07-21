@@ -29,6 +29,7 @@ func Connect() *gorm.DB {
 		&models.PurchaseEntry{},
 		&models.GrossSalesEntry{},
 		&models.WeeklyNetSales{},
+		&models.WeeklyLabourRate{},
 		&models.Employee{},
 		&models.LabourHourEntry{},
 	); err != nil {

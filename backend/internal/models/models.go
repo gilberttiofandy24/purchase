@@ -78,3 +78,13 @@ type WeeklyNetSales struct {
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }
+
+type WeeklyLabourRate struct {
+	ID            uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	StoreID       uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_labour_rate_store_week" json:"store_id"`
+	WeekStartDate time.Time `gorm:"type:date;not null;uniqueIndex:idx_labour_rate_store_week" json:"week_start_date"`
+	WeekdayRate   float64   `gorm:"type:numeric(10,2);not null;default:0" json:"weekday_rate"`
+	WeekendRate   float64   `gorm:"type:numeric(10,2);not null;default:0" json:"weekend_rate"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+}
