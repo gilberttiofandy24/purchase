@@ -82,8 +82,48 @@ func (h *StoreHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Store updated successfully", "data": store})
 }
 
+func (h *StoreHandler) Delete(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid ID"})
+		return
+	}
+
+	err = h.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("store_id = ?", id).Delete(&models.PurchaseEntry{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("store_id = ?", id).Delete(&models.Supplier{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("store_id = ?", id).Delete(&models.LabourHourEntry{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("store_id = ?", id).Delete(&models.Employee{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("store_id = ?", id).Delete(&models.GrossSalesEntry{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("store_id = ?", id).Delete(&models.WeeklyLabourRate{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("store_id = ?", id).Delete(&models.WeeklyNetSalesRate{}).Error; err != nil {
+			return err
+		}
+		return tx.Where("id = ?", id).Delete(&models.Store{}).Error
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Store deleted successfully"})
+}
+
 func RegisterStoreRoutes(rg *gin.RouterGroup, h *StoreHandler) {
 	rg.GET("/store", h.GetAll)
 	rg.POST("/store", h.Create)
 	rg.PUT("/store/:id", h.Update)
+	rg.DELETE("/store/:id", h.Delete)
 }

@@ -1,6 +1,16 @@
 'use client';
 
 import StoreDialog from '@/app/(dashboard)/store/_components/StoreDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -12,19 +22,35 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { getStores, getStoresQueryKey } from '@/lib/api/store';
+import { getErrorMessage } from '@/lib/api';
+import { deleteStore, getStores, getStoresQueryKey } from '@/lib/api/store';
 import { Store } from '@/schema/store/storeSchema';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const StorePage = () => {
+  const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editData, setEditData] = useState<Store | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Store | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: getStoresQueryKey(),
     queryFn: getStores,
+  });
+
+  const { mutate: doDelete, isPending: isDeleting } = useMutation({
+    mutationFn: (id: string) => deleteStore(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: getStoresQueryKey() });
+      toast.success('Store deleted');
+      setDeleteTarget(null);
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
   });
 
   const onEdit = (store: Store) => {
@@ -42,6 +68,28 @@ const StorePage = () => {
         }}
         editData={editData}
       />
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete store?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Store &quot;{deleteTarget?.name}&quot; and all its recorded data (suppliers,
+              employees, purchases, sales, and labour) will be permanently deleted. This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting}
+              onClick={() => deleteTarget && doDelete(deleteTarget.id)}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="flex items-center justify-between">
         <div>
@@ -92,6 +140,13 @@ const StorePage = () => {
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => onEdit(store)}>
                       Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setDeleteTarget(store)}
+                    >
+                      Delete
                     </Button>
                   </TableCell>
                 </TableRow>

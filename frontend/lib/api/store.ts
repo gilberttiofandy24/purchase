@@ -17,3 +17,7 @@ export const updateStore = async (
 ): Promise<void> => {
   await api.put(`/store/${id}`, data);
 };
+
+export const deleteStore = async (id: string): Promise<void> => {
+  await api.delete(`/store/${id}`);
+};
