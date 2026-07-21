@@ -11,7 +11,7 @@ export type Employee = {
 };
 
 export const createEmployeeSchema = z.object({
-  name: z.string().min(1, 'Nama karyawan wajib diisi'),
+  name: z.string().min(1, 'Employee name is required'),
   is_active: z.boolean(),
 });
 

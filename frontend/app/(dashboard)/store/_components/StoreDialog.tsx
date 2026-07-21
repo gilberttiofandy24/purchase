@@ -70,7 +70,7 @@ const StoreDialog = ({ isOpen, onClose, editData }: StoreDialogProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: getStoresQueryKey() });
-      toast.success(isEdit ? 'Toko diperbarui' : 'Toko dibuat');
+      toast.success(isEdit ? 'Store updated' : 'Store created');
       onClose();
     },
     onError: (error) => {
@@ -82,7 +82,7 @@ const StoreDialog = ({ isOpen, onClose, editData }: StoreDialogProps) => {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Toko' : 'Tambah Toko'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Edit Store' : 'Add Store'}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -92,7 +92,7 @@ const StoreDialog = ({ isOpen, onClose, editData }: StoreDialogProps) => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Toko</FormLabel>
+                  <FormLabel>Store Name</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Pagewood" />
                   </FormControl>

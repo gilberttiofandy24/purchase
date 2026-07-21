@@ -28,7 +28,7 @@ interface LabourGridProps {
   report: WeeklyReportData;
 }
 
-const dayLabels = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 function labourCostFor(
   date: string,
@@ -117,7 +117,7 @@ const LabourGrid = ({ storeId, weekStartDate, report }: LabourGridProps) => {
       );
     },
     onError: () => {
-      toast.error('Gagal menyimpan jam kerja');
+      toast.error('Failed to save work hours');
       queryClient.invalidateQueries({ queryKey: reportQueryKey });
     },
   });
@@ -130,7 +130,7 @@ const LabourGrid = ({ storeId, weekStartDate, report }: LabourGridProps) => {
       setNewEmployeeName('');
     },
     onError: () => {
-      toast.error('Gagal menambah karyawan');
+      toast.error('Failed to add employee');
     },
   });
 
@@ -144,13 +144,13 @@ const LabourGrid = ({ storeId, weekStartDate, report }: LabourGridProps) => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nama</TableHead>
+                <TableHead>Name</TableHead>
                 {dayLabels.map((label) => (
                   <TableHead key={label} className="text-right">
                     {label}
                   </TableHead>
                 ))}
-                <TableHead className="text-right">Total Jam</TableHead>
+                <TableHead className="text-right">Total Hours</TableHead>
                 <TableHead className="text-right">%</TableHead>
               </TableRow>
             </TableHeader>
@@ -185,7 +185,7 @@ const LabourGrid = ({ storeId, weekStartDate, report }: LabourGridProps) => {
                 <TableCell colSpan={dayLabels.length + 3}>
                   <div className="flex items-center gap-2 py-2">
                     <Input
-                      placeholder="Nama karyawan baru"
+                      placeholder="New employee name"
                       value={newEmployeeName}
                       onChange={(e) => setNewEmployeeName(e.target.value)}
                       className="max-w-xs"
@@ -196,7 +196,7 @@ const LabourGrid = ({ storeId, weekStartDate, report }: LabourGridProps) => {
                       disabled={!newEmployeeName.trim() || isAddingEmployee}
                       onClick={() => addEmployee(newEmployeeName.trim())}
                     >
-                      Tambah Karyawan
+                      Add Employee
                     </Button>
                   </div>
                 </TableCell>
@@ -230,7 +230,7 @@ const LabourGrid = ({ storeId, weekStartDate, report }: LabourGridProps) => {
 
         <div className="mt-4 flex flex-col gap-1 text-sm">
           <div>
-            Net Sales (dari Gross Sales ÷ 1.10):{' '}
+            Net Sales (Gross Sales ÷ 1.10):{' '}
             <span className="font-medium">{formatCurrency(report.net_sales_from_gross)}</span>
           </div>
           <div>

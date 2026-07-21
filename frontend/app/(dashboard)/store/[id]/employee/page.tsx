@@ -54,7 +54,7 @@ const EmployeePage = ({ params }: EmployeePageProps) => {
     mutationFn: (id: string) => deleteEmployee(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: getEmployeesQueryKey(storeId) });
-      toast.success('Karyawan dihapus');
+      toast.success('Employee deleted');
       setDeleteTarget(null);
     },
     onError: (error) => {
@@ -82,20 +82,19 @@ const EmployeePage = ({ params }: EmployeePageProps) => {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus karyawan?</AlertDialogTitle>
+            <AlertDialogTitle>Delete employee?</AlertDialogTitle>
             <AlertDialogDescription>
-              Karyawan &quot;{deleteTarget?.name}&quot; beserta seluruh data jam kerja yang
-              tercatat untuk karyawan ini akan dihapus permanen. Tindakan ini tidak bisa
-              dibatalkan.
+              Employee &quot;{deleteTarget?.name}&quot; and all its recorded work-hour data will be
+              permanently deleted. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               disabled={isDeleting}
               onClick={() => deleteTarget && doDelete(deleteTarget.id)}
             >
-              Hapus
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -103,12 +102,12 @@ const EmployeePage = ({ params }: EmployeePageProps) => {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">Karyawan</h1>
-          <p className="text-sm text-muted-foreground">Kelola daftar karyawan untuk toko ini.</p>
+          <h1 className="text-lg font-semibold">Employees</h1>
+          <p className="text-sm text-muted-foreground">Manage the employee list for this store.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link href="/store">Kembali ke Toko</Link>
+            <Link href="/store">Back to Stores</Link>
           </Button>
           <Button
             onClick={() => {
@@ -116,7 +115,7 @@ const EmployeePage = ({ params }: EmployeePageProps) => {
               setDialogOpen(true);
             }}
           >
-            Tambah Karyawan
+            Add Employee
           </Button>
         </div>
       </div>
@@ -125,7 +124,7 @@ const EmployeePage = ({ params }: EmployeePageProps) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nama Karyawan</TableHead>
+              <TableHead>Employee Name</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -134,7 +133,7 @@ const EmployeePage = ({ params }: EmployeePageProps) => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={3} className="text-center text-muted-foreground">
-                  Memuat...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : data?.data.length ? (
@@ -155,7 +154,7 @@ const EmployeePage = ({ params }: EmployeePageProps) => {
                       size="sm"
                       onClick={() => setDeleteTarget(employee)}
                     >
-                      Hapus
+                      Delete
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -163,7 +162,7 @@ const EmployeePage = ({ params }: EmployeePageProps) => {
             ) : (
               <TableRow>
                 <TableCell colSpan={3} className="text-center text-muted-foreground">
-                  Belum ada karyawan.
+                  No employees yet.
                 </TableCell>
               </TableRow>
             )}

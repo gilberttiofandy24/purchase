@@ -45,7 +45,7 @@ const NetSalesInput = ({
       );
     },
     onError: () => {
-      toast.error('Gagal menyimpan net sales');
+      toast.error('Failed to save net sales');
       queryClient.invalidateQueries({ queryKey: reportQueryKey });
     },
   });

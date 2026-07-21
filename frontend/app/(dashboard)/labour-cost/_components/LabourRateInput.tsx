@@ -60,7 +60,7 @@ const LabourRateInput = ({
       );
     },
     onError: () => {
-      toast.error('Gagal menyimpan gross rate');
+      toast.error('Failed to save gross rate');
       queryClient.invalidateQueries({ queryKey: reportQueryKey });
     },
   });
@@ -68,7 +68,7 @@ const LabourRateInput = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Gross Rate Minggu Ini</CardTitle>
+        <CardTitle>This Week's Gross Rate</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-6">
         <div className="flex items-center gap-3">

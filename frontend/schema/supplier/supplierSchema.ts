@@ -11,7 +11,7 @@ export type Supplier = {
 };
 
 export const createSupplierSchema = z.object({
-  name: z.string().min(1, 'Nama supplier wajib diisi'),
+  name: z.string().min(1, 'Supplier name is required'),
   is_active: z.boolean(),
 });
 

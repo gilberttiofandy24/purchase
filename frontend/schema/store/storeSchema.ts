@@ -9,7 +9,7 @@ export type Store = {
 };
 
 export const createStoreSchema = z.object({
-  name: z.string().min(1, 'Nama toko wajib diisi'),
+  name: z.string().min(1, 'Store name is required'),
   is_active: z.boolean(),
 });
 

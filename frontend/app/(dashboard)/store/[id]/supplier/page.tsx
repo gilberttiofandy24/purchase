@@ -54,7 +54,7 @@ const SupplierPage = ({ params }: SupplierPageProps) => {
     mutationFn: (id: string) => deleteSupplier(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: getSuppliersQueryKey(storeId) });
-      toast.success('Supplier dihapus');
+      toast.success('Supplier deleted');
       setDeleteTarget(null);
     },
     onError: (error) => {
@@ -82,20 +82,19 @@ const SupplierPage = ({ params }: SupplierPageProps) => {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus supplier?</AlertDialogTitle>
+            <AlertDialogTitle>Delete supplier?</AlertDialogTitle>
             <AlertDialogDescription>
-              Supplier &quot;{deleteTarget?.name}&quot; beserta seluruh data pembelian yang
-              tercatat untuk supplier ini akan dihapus permanen. Tindakan ini tidak bisa
-              dibatalkan.
+              Supplier &quot;{deleteTarget?.name}&quot; and all its recorded purchase data will be
+              permanently deleted. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               disabled={isDeleting}
               onClick={() => deleteTarget && doDelete(deleteTarget.id)}
             >
-              Hapus
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -104,11 +103,11 @@ const SupplierPage = ({ params }: SupplierPageProps) => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold">Supplier</h1>
-          <p className="text-sm text-muted-foreground">Kelola daftar supplier untuk toko ini.</p>
+          <p className="text-sm text-muted-foreground">Manage the supplier list for this store.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link href="/store">Kembali ke Toko</Link>
+            <Link href="/store">Back to Stores</Link>
           </Button>
           <Button
             onClick={() => {
@@ -116,7 +115,7 @@ const SupplierPage = ({ params }: SupplierPageProps) => {
               setDialogOpen(true);
             }}
           >
-            Tambah Supplier
+            Add Supplier
           </Button>
         </div>
       </div>
@@ -125,7 +124,7 @@ const SupplierPage = ({ params }: SupplierPageProps) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nama Supplier</TableHead>
+              <TableHead>Supplier Name</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -134,7 +133,7 @@ const SupplierPage = ({ params }: SupplierPageProps) => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={3} className="text-center text-muted-foreground">
-                  Memuat...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : data?.data.length ? (
@@ -155,7 +154,7 @@ const SupplierPage = ({ params }: SupplierPageProps) => {
                       size="sm"
                       onClick={() => setDeleteTarget(supplier)}
                     >
-                      Hapus
+                      Delete
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -163,7 +162,7 @@ const SupplierPage = ({ params }: SupplierPageProps) => {
             ) : (
               <TableRow>
                 <TableCell colSpan={3} className="text-center text-muted-foreground">
-                  Belum ada supplier.
+                  No suppliers yet.
                 </TableCell>
               </TableRow>
             )}

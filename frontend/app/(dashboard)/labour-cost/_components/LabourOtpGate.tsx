@@ -36,9 +36,9 @@ const LabourOtpGate = ({ children }: { children: React.ReactNode }) => {
     <Dialog open>
       <DialogContent showCloseButton={false} onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>Masukkan Kode OTP</DialogTitle>
+          <DialogTitle>Enter OTP Code</DialogTitle>
           <DialogDescription>
-            Halaman Labour Cost dilindungi. Masukkan kode OTP 6 digit untuk melanjutkan.
+            The Labour Cost page is protected. Enter the 6-digit OTP code to continue.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -61,7 +61,7 @@ const LabourOtpGate = ({ children }: { children: React.ReactNode }) => {
             <p className="text-sm text-destructive">{getErrorMessage(error)}</p>
           )}
           <Button type="submit" disabled={code.length !== 6 || isPending}>
-            {isPending ? 'Memverifikasi...' : 'Buka Halaman'}
+            {isPending ? 'Verifying...' : 'Unlock Page'}
           </Button>
         </form>
       </DialogContent>

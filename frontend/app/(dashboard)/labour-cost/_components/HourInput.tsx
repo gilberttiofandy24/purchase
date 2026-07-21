@@ -30,7 +30,7 @@ const HourInput = ({ value, onSave, disabled }: HourInputProps) => {
       }}
       maxLength={6}
       disabled={disabled}
-      placeholder="Jam"
+      placeholder="Hrs"
       className="w-20 text-right"
       {...NUMBER_PROPS}
     />

@@ -10,7 +10,7 @@ import { usePathname, useRouter } from 'next/navigation';
 const navItems = [
   { title: 'Purchase Report', url: '/purchase-report', icon: ClipboardList },
   { title: 'Labour Cost', url: '/labour-cost', icon: Users },
-  { title: 'Toko', url: '/store', icon: StoreIcon },
+  { title: 'Store', url: '/store', icon: StoreIcon },
 ];
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -33,7 +33,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   });
 
   if (isLoading) {
-    return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Memuat...</div>;
+    return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading...</div>;
   }
 
   if (isError || !data) {
@@ -64,7 +64,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           })}
         </div>
         <div className="flex flex-col gap-2 px-2">
-          <span className="text-xs text-muted-foreground">Login sebagai {data.data.username}</span>
+          <span className="text-xs text-muted-foreground">Logged in as {data.data.username}</span>
           <Button variant="outline" size="sm" onClick={() => doLogout()}>
             <LogOut className="mr-1 h-4 w-4" />
             Logout

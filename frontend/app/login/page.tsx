@@ -32,7 +32,7 @@ const LoginPage = () => {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Purchase Tracker</CardTitle>
-          <CardDescription>Masuk untuk mengelola data pembelian toko.</CardDescription>
+          <CardDescription>Sign in to manage store purchase data.</CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -61,7 +61,7 @@ const LoginPage = () => {
               />
             </div>
             <Button type="submit" disabled={isPending} className="mt-2">
-              {isPending ? 'Masuk...' : 'Masuk'}
+              {isPending ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
         </CardContent>

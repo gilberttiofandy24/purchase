@@ -93,5 +93,5 @@ export const getErrorMessage = (error: unknown): string => {
       return String((error.payload as { message: unknown }).message);
     }
   }
-  return 'Terjadi kesalahan yang tidak diketahui';
+  return 'An unknown error occurred';
 };

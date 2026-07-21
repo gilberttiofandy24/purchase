@@ -44,11 +44,11 @@ const PurchaseRatioPieChart = ({ suppliers }: PurchaseRatioPieChartProps) => {
     <Card>
       <CardHeader>
         <CardTitle>Purchase Ratio</CardTitle>
-        <CardDescription>Persentase pembelian per supplier minggu ini</CardDescription>
+        <CardDescription>Purchase share per supplier this week</CardDescription>
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Belum ada data pembelian minggu ini.</p>
+          <p className="text-sm text-muted-foreground">No purchase data for this week yet.</p>
         ) : (
           <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-80">
             <PieChart>

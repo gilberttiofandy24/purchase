@@ -71,7 +71,7 @@ const EmployeeDialog = ({ storeId, isOpen, onClose, editData }: EmployeeDialogPr
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: getEmployeesQueryKey(storeId) });
-      toast.success(isEdit ? 'Karyawan diperbarui' : 'Karyawan dibuat');
+      toast.success(isEdit ? 'Employee updated' : 'Employee created');
       onClose();
     },
     onError: (error) => {
@@ -83,7 +83,7 @@ const EmployeeDialog = ({ storeId, isOpen, onClose, editData }: EmployeeDialogPr
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Karyawan' : 'Tambah Karyawan'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Edit Employee' : 'Add Employee'}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -93,7 +93,7 @@ const EmployeeDialog = ({ storeId, isOpen, onClose, editData }: EmployeeDialogPr
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Karyawan</FormLabel>
+                  <FormLabel>Employee Name</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Ludo" />
                   </FormControl>

@@ -22,7 +22,7 @@ const StoreSelector = ({ stores, value, onChange }: StoreSelectorProps) => {
       onValueChange={(next) => next && onChange(next)}
     >
       <SelectTrigger className="w-56">
-        <SelectValue placeholder="Pilih toko" />
+        <SelectValue placeholder="Select store" />
       </SelectTrigger>
       <SelectContent>
         {stores.map((store) => (

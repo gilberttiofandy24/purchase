@@ -51,7 +51,7 @@ const PurchaseReportPage = () => {
         <div>
           <h1 className="text-lg font-semibold">Purchase Report</h1>
           <p className="text-sm text-muted-foreground">
-            Tracking pembelian mingguan per supplier per toko.
+            Weekly purchase tracking per supplier per store.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
@@ -69,7 +69,7 @@ const PurchaseReportPage = () => {
 
       {!storeId && (
         <p className="text-sm text-muted-foreground">
-          Belum ada toko. Tambahkan toko terlebih dahulu di halaman Toko.
+          No stores yet. Add a store first on the Store page.
         </p>
       )}
 

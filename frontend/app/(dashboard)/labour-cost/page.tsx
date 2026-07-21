@@ -51,7 +51,7 @@ const LabourCostPage = () => {
           <div>
             <h1 className="text-lg font-semibold">Labour Cost</h1>
             <p className="text-sm text-muted-foreground">
-              Tracking staff dan jam kerja mingguan per toko.
+              Weekly staff and work-hour tracking per store.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-4">
@@ -69,7 +69,7 @@ const LabourCostPage = () => {
 
         {!storeId && (
           <p className="text-sm text-muted-foreground">
-            Belum ada toko. Tambahkan toko terlebih dahulu di halaman Toko.
+            No stores yet. Add a store first on the Store page.
           </p>
         )}
 

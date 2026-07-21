@@ -21,7 +21,7 @@ func NewSupplierHandler(db *gorm.DB) *SupplierHandler {
 func (h *SupplierHandler) GetByStoreID(c *gin.Context) {
 	storeID, err := uuid.Parse(c.Param("store_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "store_id tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid store_id"})
 		return
 	}
 
@@ -40,13 +40,13 @@ type createSupplierRequest struct {
 func (h *SupplierHandler) Create(c *gin.Context) {
 	storeID, err := uuid.Parse(c.Param("store_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "store_id tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid store_id"})
 		return
 	}
 
 	var req createSupplierRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Nama supplier wajib diisi"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Supplier name is required"})
 		return
 	}
 
@@ -67,13 +67,13 @@ type updateSupplierRequest struct {
 func (h *SupplierHandler) Update(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "ID tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid ID"})
 		return
 	}
 
 	var req updateSupplierRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid payload"})
 		return
 	}
 
@@ -101,7 +101,7 @@ func (h *SupplierHandler) Update(c *gin.Context) {
 func (h *SupplierHandler) Delete(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "ID tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid ID"})
 		return
 	}
 

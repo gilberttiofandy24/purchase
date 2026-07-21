@@ -45,8 +45,8 @@ const StorePage = () => {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">Toko</h1>
-          <p className="text-sm text-muted-foreground">Kelola daftar toko/cabang.</p>
+          <h1 className="text-lg font-semibold">Stores</h1>
+          <p className="text-sm text-muted-foreground">Manage the list of stores/branches.</p>
         </div>
         <Button
           onClick={() => {
@@ -54,7 +54,7 @@ const StorePage = () => {
             setDialogOpen(true);
           }}
         >
-          Tambah Toko
+          Add Store
         </Button>
       </div>
 
@@ -62,7 +62,7 @@ const StorePage = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nama Toko</TableHead>
+              <TableHead>Store Name</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -71,7 +71,7 @@ const StorePage = () => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={3} className="text-center text-muted-foreground">
-                  Memuat...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : data?.data.length ? (
@@ -85,10 +85,10 @@ const StorePage = () => {
                   </TableCell>
                   <TableCell className="flex justify-end gap-2">
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/store/${store.id}/supplier`}>Kelola Supplier</Link>
+                      <Link href={`/store/${store.id}/supplier`}>Manage Suppliers</Link>
                     </Button>
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/store/${store.id}/employee`}>Kelola Karyawan</Link>
+                      <Link href={`/store/${store.id}/employee`}>Manage Employees</Link>
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => onEdit(store)}>
                       Edit
@@ -99,7 +99,7 @@ const StorePage = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={3} className="text-center text-muted-foreground">
-                  Belum ada toko.
+                  No stores yet.
                 </TableCell>
               </TableRow>
             )}

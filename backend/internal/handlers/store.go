@@ -34,7 +34,7 @@ type createStoreRequest struct {
 func (h *StoreHandler) Create(c *gin.Context) {
 	var req createStoreRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Nama toko wajib diisi"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Store name is required"})
 		return
 	}
 
@@ -54,13 +54,13 @@ type updateStoreRequest struct {
 func (h *StoreHandler) Update(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "ID tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid ID"})
 		return
 	}
 
 	var req updateStoreRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid payload"})
 		return
 	}
 

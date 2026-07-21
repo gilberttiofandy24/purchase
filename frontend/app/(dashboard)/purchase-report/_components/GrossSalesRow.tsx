@@ -24,7 +24,7 @@ interface GrossSalesRowProps {
   report: WeeklyReportData;
 }
 
-const dayLabels = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const GrossSalesRow = ({ storeId, weekStartDate, report }: GrossSalesRowProps) => {
   const queryClient = useQueryClient();
@@ -56,7 +56,7 @@ const GrossSalesRow = ({ storeId, weekStartDate, report }: GrossSalesRowProps) =
       );
     },
     onError: () => {
-      toast.error('Gagal menyimpan gross sales');
+      toast.error('Failed to save gross sales');
       queryClient.invalidateQueries({ queryKey: reportQueryKey });
     },
   });

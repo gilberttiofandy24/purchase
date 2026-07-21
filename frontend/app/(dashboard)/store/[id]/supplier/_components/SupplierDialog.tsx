@@ -71,7 +71,7 @@ const SupplierDialog = ({ storeId, isOpen, onClose, editData }: SupplierDialogPr
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: getSuppliersQueryKey(storeId) });
-      toast.success(isEdit ? 'Supplier diperbarui' : 'Supplier dibuat');
+      toast.success(isEdit ? 'Supplier updated' : 'Supplier created');
       onClose();
     },
     onError: (error) => {
@@ -83,7 +83,7 @@ const SupplierDialog = ({ storeId, isOpen, onClose, editData }: SupplierDialogPr
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Supplier' : 'Tambah Supplier'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Edit Supplier' : 'Add Supplier'}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -93,7 +93,7 @@ const SupplierDialog = ({ storeId, isOpen, onClose, editData }: SupplierDialogPr
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Supplier</FormLabel>
+                  <FormLabel>Supplier Name</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Zero Ichi" />
                   </FormControl>

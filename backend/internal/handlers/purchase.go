@@ -83,17 +83,17 @@ type weeklyReportData struct {
 func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 	storeID, err := uuid.Parse(c.Query("store_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "store_id tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid store_id"})
 		return
 	}
 
 	weekStart, err := time.Parse(dateLayout, c.Query("week_start_date"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "week_start_date harus format YYYY-MM-DD"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "week_start_date must be in YYYY-MM-DD format"})
 		return
 	}
 	if weekStart.Weekday() != time.Monday {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "week_start_date harus hari Senin"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "week_start_date must be a Monday"})
 		return
 	}
 	weekEnd := weekStart.AddDate(0, 0, 6)
@@ -298,12 +298,12 @@ type upsertPurchaseEntryRequest struct {
 func (h *PurchaseHandler) UpsertPurchaseEntry(c *gin.Context) {
 	var req upsertPurchaseEntryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid payload"})
 		return
 	}
 	purchaseDate, err := time.Parse(dateLayout, req.PurchaseDate)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "purchase_date harus format YYYY-MM-DD"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "purchase_date must be in YYYY-MM-DD format"})
 		return
 	}
 
@@ -333,12 +333,12 @@ type upsertGrossSalesRequest struct {
 func (h *PurchaseHandler) UpsertGrossSales(c *gin.Context) {
 	var req upsertGrossSalesRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid payload"})
 		return
 	}
 	salesDate, err := time.Parse(dateLayout, req.SalesDate)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "sales_date harus format YYYY-MM-DD"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "sales_date must be in YYYY-MM-DD format"})
 		return
 	}
 
@@ -363,12 +363,12 @@ type upsertNetSalesRequest struct {
 func (h *PurchaseHandler) UpsertNetSales(c *gin.Context) {
 	var req upsertNetSalesRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid payload"})
 		return
 	}
 	weekStart, err := time.Parse(dateLayout, req.WeekStartDate)
 	if err != nil || weekStart.Weekday() != time.Monday {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "week_start_date harus format YYYY-MM-DD dan hari Senin"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "week_start_date must be in YYYY-MM-DD format and a Monday"})
 		return
 	}
 
@@ -394,12 +394,12 @@ type upsertLabourRateRequest struct {
 func (h *PurchaseHandler) UpsertLabourRate(c *gin.Context) {
 	var req upsertLabourRateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid payload"})
 		return
 	}
 	weekStart, err := time.Parse(dateLayout, req.WeekStartDate)
 	if err != nil || weekStart.Weekday() != time.Monday {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "week_start_date harus format YYYY-MM-DD dan hari Senin"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "week_start_date must be in YYYY-MM-DD format and a Monday"})
 		return
 	}
 
@@ -430,12 +430,12 @@ type upsertLabourHourEntryRequest struct {
 func (h *PurchaseHandler) UpsertLabourHourEntry(c *gin.Context) {
 	var req upsertLabourHourEntryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid payload"})
 		return
 	}
 	entryDate, err := time.Parse(dateLayout, req.EntryDate)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "entry_date harus format YYYY-MM-DD"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "entry_date must be in YYYY-MM-DD format"})
 		return
 	}
 
@@ -463,12 +463,12 @@ type verifyLabourOtpRequest struct {
 func (h *PurchaseHandler) VerifyLabourOtp(c *gin.Context) {
 	var req verifyLabourOtpRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid payload"})
 		return
 	}
 	expected := os.Getenv("LABOUR_OTP_CODE")
 	if expected == "" || req.Code != expected {
-		c.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Kode OTP salah"})
+		c.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": "Invalid OTP code"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "OTP valid"})

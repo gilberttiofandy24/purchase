@@ -27,7 +27,7 @@ interface PurchaseGridProps {
   report: WeeklyReportData;
 }
 
-const dayLabels = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const PurchaseGrid = ({ storeId, weekStartDate, report }: PurchaseGridProps) => {
   const queryClient = useQueryClient();
@@ -74,7 +74,7 @@ const PurchaseGrid = ({ storeId, weekStartDate, report }: PurchaseGridProps) => 
       );
     },
     onError: () => {
-      toast.error('Gagal menyimpan data pembelian');
+      toast.error('Failed to save purchase data');
       queryClient.invalidateQueries({ queryKey: reportQueryKey });
     },
   });
@@ -87,7 +87,7 @@ const PurchaseGrid = ({ storeId, weekStartDate, report }: PurchaseGridProps) => 
       setNewSupplierName('');
     },
     onError: () => {
-      toast.error('Gagal menambah supplier');
+      toast.error('Failed to add supplier');
     },
   });
 
@@ -137,7 +137,7 @@ const PurchaseGrid = ({ storeId, weekStartDate, report }: PurchaseGridProps) => 
             <TableCell colSpan={dayLabels.length + 3}>
               <div className="flex items-center gap-2 py-2">
                 <Input
-                  placeholder="Nama supplier baru"
+                  placeholder="New supplier name"
                   value={newSupplierName}
                   onChange={(e) => setNewSupplierName(e.target.value)}
                   className="max-w-xs"
@@ -148,7 +148,7 @@ const PurchaseGrid = ({ storeId, weekStartDate, report }: PurchaseGridProps) => 
                   disabled={!newSupplierName.trim() || isAddingSupplier}
                   onClick={() => addSupplier(newSupplierName.trim())}
                 >
-                  Tambah Supplier
+                  Add Supplier
                 </Button>
               </div>
             </TableCell>
