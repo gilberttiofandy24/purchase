@@ -8,8 +8,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 const navItems = [
-  { title: 'Summary', url: '/summary', icon: LayoutDashboard },
   { title: 'Purchase Report', url: '/purchase-report', icon: ClipboardList },
+  { title: 'Summary', url: '/summary', icon: LayoutDashboard },
   { title: 'Labour Cost', url: '/labour-cost', icon: Users },
   { title: 'Store', url: '/store', icon: StoreIcon },
 ];
