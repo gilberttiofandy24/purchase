@@ -6,6 +6,7 @@ import StoreSelector from '@/app/(dashboard)/purchase-report/_components/StoreSe
 import WeekNavigator from '@/app/(dashboard)/purchase-report/_components/WeekNavigator';
 import { getStores, getStoresQueryKey } from '@/lib/api/store';
 import { getWeeklyReport, getWeeklyReportQueryKey } from '@/lib/api/purchase';
+import { getStoredStoreId, setStoredStoreId } from '@/lib/selectedStore';
 import { useQuery } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -25,12 +26,15 @@ const PurchaseReportPage = () => {
   });
 
   const stores = storesData?.data ?? [];
-  const storeId = searchParams.get('store_id') || stores[0]?.id || '';
+  const storeId = searchParams.get('store_id') || getStoredStoreId() || stores[0]?.id || '';
   const weekStartDate = searchParams.get('week') || currentMonday();
 
   const updateParams = (next: { store_id?: string; week?: string }) => {
     const sp = new URLSearchParams(searchParams.toString());
-    if (next.store_id) sp.set('store_id', next.store_id);
+    if (next.store_id) {
+      sp.set('store_id', next.store_id);
+      setStoredStoreId(next.store_id);
+    }
     if (next.week) sp.set('week', next.week);
     router.push(`/purchase-report?${sp.toString()}`);
   };
