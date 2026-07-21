@@ -29,7 +29,8 @@ func Connect() *gorm.DB {
 		&models.PurchaseEntry{},
 		&models.GrossSalesEntry{},
 		&models.WeeklyNetSales{},
-		&models.LabourEntry{},
+		&models.Employee{},
+		&models.LabourHourEntry{},
 	); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}

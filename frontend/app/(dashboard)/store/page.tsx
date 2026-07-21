@@ -87,6 +87,9 @@ const StorePage = () => {
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/store/${store.id}/supplier`}>Kelola Supplier</Link>
                     </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/store/${store.id}/employee`}>Kelola Karyawan</Link>
+                    </Button>
                     <Button variant="outline" size="sm" onClick={() => onEdit(store)}>
                       Edit
                     </Button>

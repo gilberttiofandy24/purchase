@@ -13,6 +13,14 @@ export type LabourDayInfo = {
   is_weekend: boolean;
 };
 
+export type EmployeeWeekRow = {
+  employee_id: string;
+  employee_name: string;
+  daily_hours: Record<string, number>;
+  total_hours: number;
+  percentage_of_all: number;
+};
+
 export type WeeklyReportData = {
   store_id: string;
   week_start_date: string;
@@ -23,6 +31,7 @@ export type WeeklyReportData = {
   gross_sales_total: number;
   net_sales: number;
   purchase_ratio_pct: number;
+  employees: EmployeeWeekRow[];
   labour_daily: Record<string, LabourDayInfo>;
   labour_total: number;
   net_sales_from_gross: number;

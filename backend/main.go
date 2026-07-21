@@ -36,6 +36,7 @@ func main() {
 	authHandler := auth.NewHandler(database)
 	storeHandler := handlers.NewStoreHandler(database)
 	supplierHandler := handlers.NewSupplierHandler(database)
+	employeeHandler := handlers.NewEmployeeHandler(database)
 	purchaseHandler := handlers.NewPurchaseHandler(database)
 
 	api := engine.Group("/api")
@@ -46,6 +47,7 @@ func main() {
 	{
 		handlers.RegisterStoreRoutes(protected, storeHandler)
 		handlers.RegisterSupplierRoutes(protected, supplierHandler)
+		handlers.RegisterEmployeeRoutes(protected, employeeHandler)
 		handlers.RegisterPurchaseRoutes(protected, purchaseHandler)
 	}
 

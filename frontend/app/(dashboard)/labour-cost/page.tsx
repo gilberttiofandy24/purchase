@@ -1,6 +1,6 @@
 'use client';
 
-import LabourCostRow from '@/app/(dashboard)/labour-cost/_components/LabourCostRow';
+import LabourGrid from '@/app/(dashboard)/labour-cost/_components/LabourGrid';
 import LabourOtpGate from '@/app/(dashboard)/labour-cost/_components/LabourOtpGate';
 import StoreSelector from '@/app/(dashboard)/purchase-report/_components/StoreSelector';
 import WeekNavigator from '@/app/(dashboard)/purchase-report/_components/WeekNavigator';
@@ -73,7 +73,7 @@ const LabourCostPage = () => {
         )}
 
         {report && storeId && (
-          <LabourCostRow storeId={storeId} weekStartDate={weekStartDate} report={report} />
+          <LabourGrid storeId={storeId} weekStartDate={weekStartDate} report={report} />
         )}
       </div>
     </LabourOtpGate>

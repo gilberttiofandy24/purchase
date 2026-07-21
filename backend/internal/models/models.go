@@ -50,11 +50,21 @@ type GrossSalesEntry struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type LabourEntry struct {
+type Employee struct {
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	StoreID   uuid.UUID `gorm:"type:uuid;not null;index" json:"store_id"`
+	Name      string    `gorm:"not null" json:"name"`
+	SortOrder int       `gorm:"not null;default:0" json:"sort_order"`
+	IsActive  bool      `gorm:"not null;default:true" json:"is_active"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type LabourHourEntry struct {
 	ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
-	StoreID    uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_labour_store_date" json:"store_id"`
-	EntryDate  time.Time `gorm:"type:date;not null;uniqueIndex:idx_labour_store_date" json:"entry_date"`
-	StaffCount int       `gorm:"not null;default:0" json:"staff_count"`
+	StoreID    uuid.UUID `gorm:"type:uuid;not null;index:idx_labour_hour_store_date" json:"store_id"`
+	EmployeeID uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_labour_hour_employee_date" json:"employee_id"`
+	EntryDate  time.Time `gorm:"type:date;not null;uniqueIndex:idx_labour_hour_employee_date;index:idx_labour_hour_store_date" json:"entry_date"`
 	TotalHours float64   `gorm:"type:numeric(10,2);not null;default:0" json:"total_hours"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`

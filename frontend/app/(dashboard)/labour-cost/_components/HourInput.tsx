@@ -5,37 +5,36 @@ import { useState } from 'react';
 import { NumericFormat, NumericFormatProps } from 'react-number-format';
 
 const NUMBER_PROPS = {
-  thousandSeparator: ',',
-  decimalSeparator: '.',
   displayType: 'input',
   customInput: Input,
   allowNegative: false,
   decimalScale: 2,
 } satisfies NumericFormatProps;
 
-interface AmountInputProps {
+interface HourInputProps {
   value: number;
-  onSave: (amount: number) => void;
+  onSave: (hours: number) => void;
   disabled?: boolean;
 }
 
-const AmountInput = ({ value, onSave, disabled }: AmountInputProps) => {
-  const [amount, setAmount] = useState(value);
+const HourInput = ({ value, onSave, disabled }: HourInputProps) => {
+  const [hours, setHours] = useState(value);
 
   return (
     <NumericFormat
       key={value}
-      value={amount || ''}
-      onValueChange={(values) => setAmount(Number(values.value))}
+      value={hours || ''}
+      onValueChange={(values) => setHours(Number(values.value))}
       onBlur={() => {
-        if (amount !== value) onSave(amount);
+        if (hours !== value) onSave(hours);
       }}
-      maxLength={12}
+      maxLength={6}
       disabled={disabled}
-      className="w-28 text-right"
+      placeholder="Jam"
+      className="w-20 text-right"
       {...NUMBER_PROPS}
     />
   );
 };
 
-export default AmountInput;
+export default HourInput;

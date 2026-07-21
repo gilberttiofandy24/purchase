@@ -54,6 +54,14 @@ type labourDayInfo struct {
 	IsWeekend  bool    `json:"is_weekend"`
 }
 
+type employeeWeekRow struct {
+	EmployeeID      uuid.UUID          `json:"employee_id"`
+	EmployeeName    string             `json:"employee_name"`
+	DailyHours      map[string]float64 `json:"daily_hours"`
+	TotalHours      float64            `json:"total_hours"`
+	PercentageOfAll float64            `json:"percentage_of_all"`
+}
+
 type weeklyReportData struct {
 	StoreID            uuid.UUID                `json:"store_id"`
 	WeekStartDate      string                   `json:"week_start_date"`
@@ -64,6 +72,7 @@ type weeklyReportData struct {
 	GrossSalesTotal    float64                  `json:"gross_sales_total"`
 	NetSales           float64                  `json:"net_sales"`
 	PurchaseRatioPct   float64                  `json:"purchase_ratio_pct"`
+	Employees          []employeeWeekRow        `json:"employees"`
 	LabourDaily        map[string]labourDayInfo `json:"labour_daily"`
 	LabourTotal        float64                  `json:"labour_total"`
 	NetSalesFromGross  float64                  `json:"net_sales_from_gross"`
@@ -125,15 +134,25 @@ func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 		grossByDate[g.SalesDate.Format(dateLayout)] = g.Amount
 	}
 
-	var labourEntries []models.LabourEntry
-	if err := h.db.Where("store_id = ? AND entry_date BETWEEN ? AND ?", storeID, weekStart, weekEnd).
-		Find(&labourEntries).Error; err != nil {
+	var employees []models.Employee
+	if err := h.db.Where("store_id = ? AND is_active = true", storeID).
+		Order("sort_order ASC, name ASC").Find(&employees).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
 		return
 	}
-	labourByDate := make(map[string]models.LabourEntry)
-	for _, l := range labourEntries {
-		labourByDate[l.EntryDate.Format(dateLayout)] = l
+
+	var labourHourEntries []models.LabourHourEntry
+	if err := h.db.Where("store_id = ? AND entry_date BETWEEN ? AND ?", storeID, weekStart, weekEnd).
+		Find(&labourHourEntries).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+	hoursByEmployee := make(map[uuid.UUID]map[string]float64)
+	for _, l := range labourHourEntries {
+		if hoursByEmployee[l.EmployeeID] == nil {
+			hoursByEmployee[l.EmployeeID] = make(map[string]float64)
+		}
+		hoursByEmployee[l.EmployeeID][l.EntryDate.Format(dateLayout)] = l.TotalHours
 	}
 
 	var netSalesEntry models.WeeklyNetSales
@@ -182,15 +201,47 @@ func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 		purchaseRatioPct = grandTotal / netSales * 100
 	}
 
+	employeeRows := make([]employeeWeekRow, 0, len(employees))
+	var weekTotalHours float64
+	for _, employee := range employees {
+		daily := make(map[string]float64, 7)
+		var total float64
+		for _, d := range weekDates {
+			hours := hoursByEmployee[employee.ID][d]
+			daily[d] = hours
+			total += hours
+		}
+		weekTotalHours += total
+		employeeRows = append(employeeRows, employeeWeekRow{
+			EmployeeID:   employee.ID,
+			EmployeeName: employee.Name,
+			DailyHours:   daily,
+			TotalHours:   total,
+		})
+	}
+	for i := range employeeRows {
+		if weekTotalHours > 0 {
+			employeeRows[i].PercentageOfAll = employeeRows[i].TotalHours / weekTotalHours * 100
+		}
+	}
+
 	labourFilled := make(map[string]labourDayInfo, 7)
 	var labourTotal float64
 	for i, d := range weekDates {
 		date := weekStart.AddDate(0, 0, i)
-		entry := labourByDate[d]
-		cost := labourCostForDay(date, entry.TotalHours)
+		var dayHours float64
+		var staffCount int
+		for _, employee := range employees {
+			hours := hoursByEmployee[employee.ID][d]
+			dayHours += hours
+			if hours > 0 {
+				staffCount++
+			}
+		}
+		cost := labourCostForDay(date, dayHours)
 		labourFilled[d] = labourDayInfo{
-			StaffCount: entry.StaffCount,
-			TotalHours: entry.TotalHours,
+			StaffCount: staffCount,
+			TotalHours: dayHours,
 			LabourCost: cost,
 			IsWeekend:  date.Weekday() == time.Saturday || date.Weekday() == time.Sunday,
 		}
@@ -213,6 +264,7 @@ func (h *PurchaseHandler) GetWeeklyReport(c *gin.Context) {
 		GrossSalesTotal:    grossTotal,
 		NetSales:           netSales,
 		PurchaseRatioPct:   purchaseRatioPct,
+		Employees:          employeeRows,
 		LabourDaily:        labourFilled,
 		LabourTotal:        labourTotal,
 		NetSalesFromGross:  netSalesFromGross,
@@ -318,15 +370,15 @@ func (h *PurchaseHandler) UpsertNetSales(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Net sales saved successfully"})
 }
 
-type upsertLabourEntryRequest struct {
+type upsertLabourHourEntryRequest struct {
 	StoreID    uuid.UUID `json:"store_id" binding:"required"`
+	EmployeeID uuid.UUID `json:"employee_id" binding:"required"`
 	EntryDate  string    `json:"entry_date" binding:"required"`
-	StaffCount int       `json:"staff_count" binding:"min=0"`
 	TotalHours float64   `json:"total_hours" binding:"min=0"`
 }
 
-func (h *PurchaseHandler) UpsertLabourEntry(c *gin.Context) {
-	var req upsertLabourEntryRequest
+func (h *PurchaseHandler) UpsertLabourHourEntry(c *gin.Context) {
+	var req upsertLabourHourEntryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Payload tidak valid"})
 		return
@@ -337,21 +389,21 @@ func (h *PurchaseHandler) UpsertLabourEntry(c *gin.Context) {
 		return
 	}
 
-	entry := models.LabourEntry{
+	entry := models.LabourHourEntry{
 		StoreID:    req.StoreID,
+		EmployeeID: req.EmployeeID,
 		EntryDate:  entryDate,
-		StaffCount: req.StaffCount,
 		TotalHours: req.TotalHours,
 	}
 	err = h.db.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "store_id"}, {Name: "entry_date"}},
-		DoUpdates: clause.AssignmentColumns([]string{"staff_count", "total_hours", "updated_at"}),
+		Columns:   []clause.Column{{Name: "employee_id"}, {Name: "entry_date"}},
+		DoUpdates: clause.AssignmentColumns([]string{"total_hours", "updated_at"}),
 	}).Create(&entry).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Labour entry saved successfully"})
+	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Labour hour entry saved successfully"})
 }
 
 type verifyLabourOtpRequest struct {
@@ -377,6 +429,6 @@ func RegisterPurchaseRoutes(rg *gin.RouterGroup, h *PurchaseHandler) {
 	rg.PUT("/purchase/entry", h.UpsertPurchaseEntry)
 	rg.PUT("/purchase/gross-sales", h.UpsertGrossSales)
 	rg.PUT("/purchase/net-sales", h.UpsertNetSales)
-	rg.PUT("/purchase/labour-entry", h.UpsertLabourEntry)
+	rg.PUT("/labour/hour-entry", h.UpsertLabourHourEntry)
 	rg.POST("/labour/verify-otp", h.VerifyLabourOtp)
 }

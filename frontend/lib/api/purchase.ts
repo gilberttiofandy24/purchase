@@ -43,13 +43,13 @@ export const upsertNetSales = async (data: {
   await api.put('/purchase/net-sales', data);
 };
 
-export const upsertLabourEntry = async (data: {
+export const upsertLabourHourEntry = async (data: {
   store_id: string;
+  employee_id: string;
   entry_date: string;
-  staff_count: number;
   total_hours: number;
 }): Promise<void> => {
-  await api.put('/purchase/labour-entry', data);
+  await api.put('/labour/hour-entry', data);
 };
 
 export const verifyLabourOtp = async (code: string): Promise<void> => {
